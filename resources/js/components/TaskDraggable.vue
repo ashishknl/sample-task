@@ -3,7 +3,7 @@
 		<div class="col-md-4 dragable__scroll" v-for="(item, index1) in allContents">   
             <section class="list">
                 <header>{{splitColumn(index1)}}</header>
-                <draggable class="list__drag-area"  :list="item" :options="{animation:200, group:'status'}" :element="'article'" @add="onAdd($event, true,index1)"  @change="update(allTasks)">
+                <draggable class="list__drag-area"  :list="item" :options="{animation:200, group:'status'}" :element="'article'" @add="onAdd($event, true,index1)"  @change="update()">
                     <article class="list__drag-area__card" v-for="(task, index) in item" :key="task.id" :data-id="task.id">
                         <header v-on:click="show(task.desc,task.title,task.id)">
                             {{ task.title }}
@@ -51,10 +51,10 @@
         components: {
             draggable
         },
-        props: ['allContents','allTasks'],
+        props: ['allContents'],
         data() {
             return {
-                allContents: this.allContents
+                allContentsNew: this.allContents
             }
         },
         methods: {
@@ -69,12 +69,12 @@
                     console.log(error);
                 })
             },
-            update:function(list) {
-			list.map((task, index) => {
+            update:function() {
+			var parsedobj = JSON.parse(JSON.stringify(this.allContentsNew))
+			let tasks=objLength(parsedobj);
+			tasks.map((task, index) => {
                     task.order = index + 1;
                 });
-                let tasks = list;
-				console.log(tasks);
 
                 axios.put('/demos/tasks/updateAll', {
                     tasks: tasks
@@ -167,6 +167,15 @@
         
     }
     }
+	function objLength(obj){
+	var tasks=[];
+	Object.entries(obj).forEach(([key, value]) => {
+	Object.entries(value).forEach(([key2, value2]) => {
+	tasks.push(value2);
+});
+});
+return tasks;
+}
 	
 	
 	
